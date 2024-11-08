@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Poppins', sans-serif;
+  @apply bg-slate-50;
+
+}
+
+:root {
+  --primary-color:red;
+  --text-color:#fff;
+}
+
+* {
+  font-family: 'Popins' sans-serif;
+  font-size: 16px;;
+}
+
+
+body {
+  padding:0;
+  margin:0;
+  /* background-color: rgb(40, 40, 146); */
+  height: 100%;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-position: top;
+}
+
+#root {
+  height: 100vh;
+}
+
+.login-container {
+  /* display: flex;
+  align-items: center;
+  justify-content: center; */
+}
+
+.container-inner {
+  background-color: orange;
+  height: 400px;
+  width: 30%;
+}
+
+
+.PhoneInput {
+  display: flex;
+  position: relative;
+}
+
+.PhoneInputCountryIcon.PhoneInputCountryIcon--border {
+  position: absolute;
+  top:10px;
+  left: 10px;
+}
+
+.PhoneInput img {
+  width: 30px;
+  border: 1px solid #ddd;
+}
+
+.PhoneInput select {
+  display: none;
+}
+
+.PhoneInput input {
+  padding: 0.5rem 0.5rem 0.5rem 3rem;
+  font-weight: 500;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(203 213 225 / var(--tw-border-opacity));
+  width: 100%;
+  border-radius: 10px;
+}
+
+
+.register .PhoneInput input {
+  background-color: #2F5D50;
+  border: none;
+}
+
+.register .PhoneInput input:focus {
+  outline: none;
+}
+
+@media screen  and (max-width:480px) {
+  body {
+    background-image: url('/images/bg-image.jpg');
+    background-color: #05204b;
+  }
+}
