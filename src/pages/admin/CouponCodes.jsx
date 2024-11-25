@@ -143,19 +143,19 @@ export default function CouponCodes() {
 
 
                     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mt-5">
+                        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mt-5 sm:text-xs">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3">
+                                    <th scope="col" className="px-3 py-2 text-sm">
                                         Code
                                     </th>
-                                    <th scope="col" className="px-6 py-3">
+                                    <th scope="col" className="px-3 py-2 text-sm">
                                         Is Active
                                     </th>
-                                    <th scope="col" className="px-6 py-3">
+                                    <th scope="col" className="px-3 py-2 text-sm">
                                         Expires On
                                     </th>
-                                    <th scope="col" className="px-6 py-3">
+                                    <th scope="col" className="px-3 py-2 text-sm">
                                         Action
                                     </th>
                                 </tr>
@@ -165,18 +165,18 @@ export default function CouponCodes() {
                                     couponCodes && couponCodes.map(coupon_code => {
                                         return (
                                             <tr key={coupon_code.code}className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <th scope="row" className="text-xs px-2 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                    {coupon_code.code}
                                                 </th>
-                                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <th scope="row" className="text-xs px-2 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                    {coupon_code.is_active ? "Active" : "Inactive"}
                                                 </th>
 
-                                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <th scope="row" className="text-xs px-2 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                    {new Date(coupon_code.expires_on).toDateString()}
                                                 </th>
 
-                                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <th scope="row" className="text-xs px-2 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                    <button className='mx-2 bg-red-400 text-white p-2 rounded-md' onClick={() => deleteCode(coupon_code.code)}>
                                                         <BiTrash size={20}/>
                                                    </button>

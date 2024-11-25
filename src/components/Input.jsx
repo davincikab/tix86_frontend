@@ -50,7 +50,7 @@ export const Input = ({
   const inputErrors = findInputError(errors, name)
   const isInvalid = isFormInvalid(inputErrors)
 
-  const input_tailwind = `${inputClassname} p-2 font-medium w-full placeholder:opacity-60 rounded-[10px] h-12 px-3 focus:outline-none border-gray-200 border`;
+  const input_tailwind = `${inputClassname} p-2 font-medium w-full placeholder:opacity-60 rounded-[10px] h-12 px-3 focus:outline-none border-gray-200 border text-black`;
 
   return (
     <div className={cn('flex flex-col w-full gap-2')}>

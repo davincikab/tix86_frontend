@@ -63,7 +63,13 @@ export default function LoginPage() {
                     </div>
 
                     <div className="my-3">
-                        <Input name="password"  type={"password"}/>
+                        <Input 
+                            name="password" 
+                            type="password" 
+                            label="Password"
+                            id="password"
+                            validation={{ required: { value:true, message:"Required" }}}
+                        />
                     </div>
 
                     <button
