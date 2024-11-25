@@ -2,7 +2,7 @@ export default function Footer() {
   return (
     <div className='p-3 bg-white text-gray-900'>
 
-        <div className="max-w-[1280px] mx-auto flex justify-between">
+        <div className="max-w-[1280px] mx-auto flex justify-between md:flex-row flex-col">
             <div className="flex-1">
                 <div className="font-semi-bold">Complete Privacy</div>
                 <div className="text-sm my-2">
@@ -22,7 +22,7 @@ export default function Footer() {
 
         <hr className="my-2"/>
         <div className="text-center ">
-            &copy; 2024. Tix86.com
+            &copy; 2024. tix86.com
         </div>
        
     </div>

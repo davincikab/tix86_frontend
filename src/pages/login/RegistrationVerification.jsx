@@ -41,7 +41,7 @@ export default function RegistrationVerificationPage() {
             let { data: { message } } = error.response;
 
             if(message == "Email has been verified") {
-                navigate("/login")
+                navigate("/sigin")
             } else {
                 setError(error.response.data.message);
             }

@@ -1,6 +1,6 @@
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-// import { validateJwtToken } from './services/utils';
+import { validateJwtToken } from './services/utils';
 import { useEffect } from 'react';
 
 
@@ -9,14 +9,13 @@ const App = () => {
 
   // const newServer = useSelector((state) => state.session.server.newServer);
   // const initialized = useSelector((state) => !!state.session.user);
-  const user = {};
-  // useSelector((state) => state.session.user);
-  const initialized = true;
-  // validateJwtToken(localStorage.getItem("token"));
+  const user = useSelector((state) => state.session.user);
+  const initialized = validateJwtToken(localStorage.getItem("accessToken"));
   console.log(initialized, user);
+
   useEffect(() => {
     if(!initialized) {
-      navigate("/login");
+      navigate("/signin");
     } else {
       // loadData()
     }
@@ -24,7 +23,7 @@ const App = () => {
   }, [initialized, navigate]);
   
 
-  return !initialized ? (<div className='text-white'>Loading...</div>) : (
+  return !initialized ? (<div className='text-black'>Loading...</div>) : (
     <>
     
       <div className="page w-full h-full">

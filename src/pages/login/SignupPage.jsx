@@ -24,7 +24,7 @@ export default function SignupPage() {
             localStorage.setItem("email", data.email);
 
             // redirect to verification page
-            navigate("/verify_email");
+            navigate("/verify_mail");
         } catch (error) {
             console.log(error);
         }

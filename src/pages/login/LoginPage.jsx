@@ -1,29 +1,69 @@
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Input } from "../../components/Input";
-import { name_validation, password_validation } from "../../utils/input_validation";
+import { name_validation, password_validation, phone_validation } from "../../utils/input_validation";
 import LoginLayout from "./loginLayout";
+import axios from "../../services/axio-config";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { sessionActions } from "../../store";
 
 
 export default function LoginPage() {
     const methods = useForm();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const [identifier, setIdentifier] = useState("email");
+    const [error, setError] = useState("");
 
     const onSubmit = methods.handleSubmit((data) => {
         console.log(data);
 
         // 
+        handleLogin(data);
     })
+
+    const handleLogin = async (data) => {
+        try {
+            let response = await axios.post('/signin', {...data, username:data[identifier], identifier });
+            let { user, accessToken, refreshToken } = response.data; 
+
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+
+            dispatch(sessionActions.updateUser(user));
+           
+            
+            navigate("/");
+        } catch (error) {
+            console.log(error);
+            setError(error.response.data.message);
+        }
+    }
+
+    const validateInput = (value) => {
+        // autodetect a phone number or email
+        setIdentifier(value)
+    }
 
     // login either using password or email
     return (
         <LoginLayout>
             <FormProvider {...methods}>
                 <form action="" className="px-3">
+                    { error ? <p className="text-red-600">{error}</p> : ""}
                     <div className="my-3">
-                        <Input name="email" {...name_validation} label={"Email or Phone Number"}/>
+                        { 
+                            identifier == "email" ? 
+                            <Input  {...name_validation} label={"Email"} name="email"/> :
+                            <Input  {...phone_validation} label={"Phone Number"} name="phone_number"/> 
+                        }
                     </div>
 
                     <div className="my-3">
-                        <Input name="password" {...password_validation}/>
+                        <Input name="password"  type={"password"}/>
                     </div>
 
                     <button

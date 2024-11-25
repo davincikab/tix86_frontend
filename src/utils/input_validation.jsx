@@ -1,3 +1,5 @@
+import { pattern } from "framer-motion/client";
+
 export const name_validation = {
     name: 'name',
     label: 'name',
@@ -125,7 +127,7 @@ export const url_validation = {
         },
         pattern: {
           // value:/^[-a-zA-Z0-9@:%_+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&//=]*)?/gi,
-          value:/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi,
+          value:/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi,
           message:'not valid'
         },
     },
@@ -149,3 +151,22 @@ export const desc_validation = {
       },
     },
   }
+
+
+export const coupon_code_validation = {
+  validation: {
+    required: {
+      value: true,
+      message: 'required',
+    },
+    maxLength: {
+      value: 5,
+      message: '5 characters max',
+    },
+    pattern:{
+       value:/[0-9a-zA-Z]{5}/g,
+          message:'Invalid Code'
+    }
+  }
+}
+

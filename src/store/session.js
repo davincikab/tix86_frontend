@@ -1,16 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 
+let userInfo = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
 const { reducer, actions} = createSlice({
     name:'session',
     initialState:{
-        user:null,
-        streets:null,
+        user:userInfo,
+        profile:null,
         server:{}
     },
     reducers:{
-        updateServer(state, action) {
-            state.server = action.payload;
+        updateProfile(state, action) {
+            state.profile = action.payload;
         },
         updateUser(state, action) {
             state.user = action.payload;

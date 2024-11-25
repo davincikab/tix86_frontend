@@ -16,7 +16,7 @@ const instance = axios.create({
 // });
 
 instance.interceptors.request.use(request => {
-  const accessToken = localStorage.getItem('token');
+  const accessToken = localStorage.getItem('accessToken');
   if (accessToken) {
     request.headers['Authorization'] = `Bearer ${accessToken}`;
   }
@@ -30,31 +30,36 @@ instance.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
+    console.log(error);
+    
     if(error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      try {
-        const refreshToken = localStorage.getItem("refresh");
-        const response = await axios.post("/api/v1/auth/refresh/", {refresh:refreshToken});
+      window.location.href = '/signin';
 
-        console.log(response);
-        let { access, refresh } = response.data;
+      // try {
+      //   const refreshToken = localStorage.getItem("refreshToken");
+      //   const response = await axios.post(`${BASE_URL}refresh`, {refresh:refreshToken});
 
-        // let accessToken
-        localStorage.setItem('token', access);
-        localStorage.setItem('refresh', refresh);
+      //   let { access, refresh } = response.data;
 
-        // Update the authorization header with the new access token.
-        instance.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+      //   // let accessToken
+      //   localStorage.setItem('accessToken', access);
+      //   localStorage.setItem('refreshToken', refresh);
 
-      } catch (error) {
-        console.error('Token refresh failed:', error);
-        localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
+      //   // Update the authorization header with the new access token.
+      //   instance.defaults.headers.common['Authorization'] = `Bearer ${access}`;
 
-        window.location.href = '/login';
-        return Promise.reject(error);
-      }
+      // } catch (error) {
+      //   console.error('Token refresh failed:', error);
+        
+      //   localStorage.removeItem("user");
+      //   localStorage.removeItem("accessToken");
+      //   localStorage.removeItem("refreshToken");
+
+      //   window.location.href = '/signin';
+      //   return Promise.reject(error);
+      // }
     }
 
     return Promise.reject(error);
