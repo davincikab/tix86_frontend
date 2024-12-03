@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Input } from "../../components/Input";
-import { name_validation, password_validation, phone_validation } from "../../utils/input_validation";
+import { email_validation, name_validation, password_validation, phone_validation } from "../../utils/input_validation";
 import LoginLayout from "./loginLayout";
 import axios from "../../services/axio-config";
 import { useDispatch } from "react-redux";
@@ -57,7 +57,7 @@ export default function LoginPage() {
                     <div className="my-3">
                         { 
                             identifier == "email" ? 
-                            <Input  {...name_validation} label={"Email"} name="email"/> :
+                            <Input  {...email_validation} label={"Email"} name="email"/> :
                             <Input  {...phone_validation} label={"Phone Number"} name="phone_number"/> 
                         }
                     </div>

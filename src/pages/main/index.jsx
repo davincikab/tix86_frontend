@@ -42,8 +42,11 @@ const MainPage = () => {
   );
 
   const zoomToBounds = useCallback(() => {
+    console.log(streets);
+    // return;
       if(streets.length) {
         let bounds = streets.map(street => JSON.parse(street.bounds));
+        console.log(bounds);
         bounds = bounds.map(bound => [bound.slice(0,2), bound.slice(2,)]).flat(1);
         
 
@@ -55,7 +58,7 @@ const MainPage = () => {
         setMapBounds(mapBounds);
         
         if(mapRef.current) {
-          // mapRef.current.fitBounds(mapBounds,{padding:50});
+          mapRef.current.fitBounds(mapBounds,{padding:50});
           setMapZoomed(true);
         }
         // console.log(bounds);
@@ -80,6 +83,7 @@ const MainPage = () => {
   },[user, dispatch, state]);
 
   useEffect(() => {
+    console.log("Zoome end: ", mapZoomed);
       if(!mapZoomed) {
         zoomToBounds();
       }
@@ -116,9 +120,10 @@ const MainPage = () => {
           'dl2_day':street['DL2 DAY'], 
           'dl2_time':street['DL2 TIME'], 
           'address':street['SL'], 
+          'bounds':bounds
         };
 
-        setStreets(prevState => [...prevState, {...info, bounds}]);
+        setStreets(prevState => [...prevState, {...info }]);
       }
 
     }
@@ -164,8 +169,8 @@ const MainPage = () => {
   }
 
   // console.log(streets);
-  console.log(map_bounds);
-  console.log(mapRef, mapZoomed);
+  console.log(streets);
+  // console.log(mapRef, mapZoomed);
   let { text_notification, email_notification, twelve_hours, one_hour } = state;
   
   return (
@@ -207,7 +212,7 @@ const MainPage = () => {
           <GeocoderControl mapboxAccessToken={accessToken} position="top-left" />
         </Map>
      
-      <div className="absolute bg-white z-10 top-0 right-0 bottom-5 m-5 rounded-[5px] text-black w-[300px] shadow-lg">
+      <div className="absolute bg-white z-10 md:top-0 right-0 md:bottom-5 md:m-5 rounded-[5px] text-black w-[300px] shadow-lg overflow-y-auto m-0 top-[50vh] bottom-0">
         <h6 className="text-center mx-0 font-bold capitalize bg-gray-100 p-4">Set your street sweeping alerts</h6>
         <hr className='my-1'/>
         <div className="px-4 py-2">

@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <div className='p-3 bg-white text-gray-900'>
+    <div className='p-3 md:bg-white md:text-gray-900 text-white'>
 
         <div className="max-w-[1280px] mx-auto flex justify-between md:flex-row flex-col">
             <div className="flex-1">

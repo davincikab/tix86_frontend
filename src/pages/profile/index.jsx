@@ -8,7 +8,7 @@ import {
   PayPalButtons,
   usePayPalScriptReducer
 } from "@paypal/react-paypal-js";
-import { useEffect,useCallback } from 'react';
+import { useEffect,useCallback, useState } from 'react';
 import { sessionActions } from '../../store';
 import axios from '../../services/axio-config';
 import { formatPhoneNumber, formatPhoneNumberIntl } from 'react-phone-number-input';
@@ -17,6 +17,9 @@ export default function ProfilePage() {
   const profile = useSelector(state => state.session.profile);
   const user = useSelector(state => state.session.user);
   const dispatch = useDispatch();
+  const [promoCode, setPromoCode] = useState("");
+  const [error, setError] = useState(null);
+  console.log(profile);
 
   const loadUserStreets = useCallback(async() => {
     try {
@@ -58,6 +61,24 @@ export default function ProfilePage() {
       });
   }
 
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    try {
+      let response = await axios.post('/activate_subscription_by_couponcode', {code:promoCode, userId:user.id });
+      console.log(response);
+
+      let { subscription } = response.data;
+      dispatch(sessionActions.updateProfile({...profile,subscription}))      
+    } catch (error) {
+      console.log(error);
+      if(error.status == 500) {
+        setError(error.response.data.error);
+      }
+      
+    }
+  }
+
 
   // promo code activation
   console.log(profile);
@@ -67,10 +88,10 @@ export default function ProfilePage() {
     <div className='w-full h-full relative overflow-x-hidden '>
         <Navbar />
         { !profile ?
-        <div className="">
+        <div className="relative h-auto bg-gray-300 p-5 min-h-[80vh]">
           <p>Loading User Data</p>
         </div>
-        : <div className="relative h-auto bg-gray-300 p-5">   
+        : <div className="relative h-auto bg-gray-300 p-5 min-h-[80vh]">   
 
 
             <div className="user-info-section relative min-h-[40%] h-auto mx-auto max-w-[1080px] bg-white shadow-md p-5 rounded-md">
@@ -178,11 +199,11 @@ export default function ProfilePage() {
                         Change Password
                       </a>
 
-                      <button className='p-3 shadow-md rounded-md text-white bg-[#0163AA] w-full'>
+                      <a href="/profile_update" className='p-3 shadow-md rounded-md text-white bg-[#0163AA] w-full'>
                         Update Profile
-                      </button>
+                      </a>
 
-                      <button className='p-3 shadow-md rounded-md text-white bg-red-600 w-full'>
+                      <button className='p-3 shadow-md rounded-md text-white bg-red-600 w-full hidden'>
                         Cancel Subscription
                       </button>
                     </div>
@@ -193,7 +214,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="relative payment-section md:flex-row py-10 space-x-5 flex-col flex justify-center mx-auto max-w-[1080px] bg-white shadow-md px-3 rounded-md mt-5">
+            { !profile?.subscription.is_active && <div className="relative payment-section md:flex-row py-10 space-x-5 flex-col flex justify-center mx-auto max-w-[1080px] bg-white shadow-md px-3 rounded-md mt-5">
 
               <div className="absolute top-1 p-3">
                 <h4 className='font-semibold text-lg'>Payment Details</h4>
@@ -204,10 +225,14 @@ export default function ProfilePage() {
                     <div className="card-header">
                         <h5 className="">Promo Code</h5>
                     </div>
-                    <form className="form-horizontal" method="POST" id="promo-form">
+                    <form className="form-horizontal" method="POST" id="promo-form" onSubmit={handleSubmit}>
                         
                       <div className="form-group px-0">
                           <label htmlFor="promo_code"></label>
+                          <p className='text-red-400 text-sm'>
+                            {error}
+                          </p>
+
                           <input 
                             type="text" 
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -215,6 +240,8 @@ export default function ProfilePage() {
                             placeholder="Your Promo code ...." 
                             pattern="[0-9a-zA-Z]{5}" 
                             maxLength="5" 
+                            value={promoCode}
+                            onChange={(e) => setPromoCode(e.target.value)}
                           />
                           
                         </div>
@@ -250,7 +277,7 @@ export default function ProfilePage() {
                 </div>
                 <input type="hidden" name="csrfmiddlewaretoken" value="a5e8Gaim7V4rYIt8h4MizF7I9hDC7YgYT739DGPzcvaoR87XrlFxHWsKGFIEYocw" />
               </div>
-            </div>
+            </div> }
         </div> }
         <Footer />
     </div>

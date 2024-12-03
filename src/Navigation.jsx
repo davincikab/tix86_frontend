@@ -10,13 +10,16 @@ import App from './App';
 import LoginPage from './pages/login/LoginPage';
 import SignupPage from './pages/login/SignupPage';
 import ProfilePage from './pages/profile';
-import ResetPasswordPage from './pages/login/ResetPasswordPage';
+import ResetPasswordPage from './pages/login/RequestResetPasswordPage';
 import RegistrationVerificationPage from './pages/login/RegistrationVerification';
 import ChangePassword from './pages/login/ChangePassword';
 import { useSelector } from 'react-redux';
 import AdminPage from './pages/admin';
 import Customer from './pages/admin/Customers';
 import CouponCodes from './pages/admin/CouponCodes';
+import ProfileUpdate from './pages/profile/ProfileUpdate';
+import RequestResetPasswordPage from './pages/login/RequestResetPasswordPage';
+import ResetPassword from './pages/login/ResetPassword';
   
 
 const ProtectedRoute = ({ redirectPath="/signin", isAllowed, children}) => {
@@ -27,8 +30,11 @@ const ProtectedRoute = ({ redirectPath="/signin", isAllowed, children}) => {
   return children ? children : <Outlet />;
 }
 const Navigation = () => {
-  const user = useSelector(state => state.session.user);
-
+  const user= useSelector(state => state.session.user);
+  // const user = profile ? profile.user : null;
+  const isAdmin = (roles) => {
+    return roles && roles[0].name == "admin";
+  }
   return (
       <Routes>
           <Route path="/signin" element={<LoginPage />} />
@@ -42,10 +48,17 @@ const Navigation = () => {
               </ProtectedRoute> 
             } 
           />
+          <Route path="/profile_update" 
+            element={
+              <ProtectedRoute isAllowed={user && user.email}>
+                <ProfileUpdate />
+              </ProtectedRoute> 
+            } 
+          />
 
           <Route path="/admin" 
             element={
-              <ProtectedRoute isAllowed={user && user.email}>
+              <ProtectedRoute redirectPath="/" isAllowed={user && isAdmin(user.roles)}>
                 <AdminPage />
               </ProtectedRoute> 
             } 
@@ -53,7 +66,7 @@ const Navigation = () => {
 
           <Route path="/admin/customers" 
             element={
-              <ProtectedRoute isAllowed={user && user.email}>
+              <ProtectedRoute redirectPath="/" isAllowed={user && isAdmin(user.roles)}>
                 <Customer />
               </ProtectedRoute> 
             } 
@@ -61,7 +74,7 @@ const Navigation = () => {
 
           <Route path="/admin/coupon_codes" 
             element={
-              <ProtectedRoute isAllowed={user && user.email}>
+              <ProtectedRoute redirectPath="/" isAllowed={user && isAdmin(user.roles)} >
                 <CouponCodes />
               </ProtectedRoute> 
             } 
@@ -75,7 +88,8 @@ const Navigation = () => {
             } 
           />
           
-          <Route path="/forgot_password" element={<ResetPasswordPage />} />
+          <Route path="/forgot_password" element={<RequestResetPasswordPage />} />
+          <Route path="/reset_password/:token" element={<ResetPassword />} />
 
           <Route path="/" element={ <App />}>
             <Route index element={ <MainPage />} />

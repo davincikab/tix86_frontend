@@ -1,15 +1,30 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { Input } from "../../components/Input";
-import { name_validation, password_validation } from "../../utils/input_validation";
+import { email_validation } from "../../utils/input_validation";
 import LoginLayout from "./loginLayout";
+import { useState } from "react";
+import axios from '../../services/axio-config';
 
 
-export default function ResetPasswordPage() {
+export default function RequestResetPasswordPage() {
     const methods = useForm();
+    const [error, setError] = useState();
+    const [ successMessage, setSuccessMessage] = useState("")
 
-    const onSubmit = methods.handleSubmit((data) => {
+    const onSubmit = methods.handleSubmit(async(data) => {
         console.log(data);
 
+        try {
+            let response = await axios.post("/send_password_reset_link", {...data});
+            console.log(response);
+            setSuccessMessage(response.data);
+        } catch (error) {
+            console.log(error);
+
+            if(error.status == 500) {
+                setError(error.response.data);
+            }
+        }
         // 
     })
 
@@ -18,8 +33,10 @@ export default function ResetPasswordPage() {
         <LoginLayout>
             <FormProvider {...methods}>
                 <form action="" className="px-3">
+                    <p>{successMessage}</p>
+                    <p className="text-sm text-red-500">{error}</p>
                     <div className="my-3">
-                        <Input name="email" {...name_validation} label={"Email"}/>
+                        <Input name="email" {...email_validation} label={"Email"}/>
                     </div>
 
                     <button

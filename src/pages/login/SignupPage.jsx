@@ -1,6 +1,6 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import LoginLayout from './loginLayout';
-import { name_validation, password_validation, phone_validation } from '../../utils/input_validation';
+import { email_validation, name_validation, password_validation, phone_validation } from '../../utils/input_validation';
 import { Input } from '../../components/Input';
 import axios from '../../services/axio-config';
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +36,7 @@ export default function SignupPage() {
             <FormProvider {...methods}>
                 <form action="" className="px-3">
                     <div className="my-3">
-                        <Input  {...name_validation} label={"Email"} name="email"/>
+                        <Input  {...email_validation} label={"Email"} name="email"/>
                     </div>
 
                     <div className="my-3">
