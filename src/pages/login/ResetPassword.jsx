@@ -6,6 +6,7 @@ import { Input } from '../../components/Input';
 import { FormProvider, useForm } from 'react-hook-form';
 import axios from "../../services/axio-config";
 import { useNavigate, useParams } from 'react-router-dom';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 
 
 export default function ResetPassword() {
@@ -14,7 +15,8 @@ export default function ResetPassword() {
     const { token } = useParams();
 
     const [error, setError] = useState();
-    const [ successMessage, setSuccessMessage] = useState("")
+    const [showPassword, setShowPassword] = useState(false);
+    // const [ successMessage, setSuccessMessage] = useState("")
 
     const onSubmit = methods.handleSubmit(data => {
         console.log(data);
@@ -52,11 +54,14 @@ export default function ResetPassword() {
                         <form className="p-2 w-full p-5">
                         <p className="text-sm text-red-500">{error}</p>
                             <div className="flex flex-col">
-                                <div className="my-3">
-                                    <Input {...password_validation} name="password"/>
+                                <div className="my-3 relative">
+                                    <Input {...password_validation} name="password" type={ showPassword ? "text" : "password" }/>
+                                    <div className="absolute top-10 right-3 bg-red-0 z-10 p-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                        {!showPassword ? <RiEyeLine /> : <RiEyeOffLine />}
+                                    </div>
                                 </div>
 
-                                <div className="my-3">
+                                <div className="my-3 relative">
                                     {/* <Input name="password-confirmation" {...password_validation} label={"Confirm Password"}/> */}
 
                                     <Input 
@@ -64,6 +69,7 @@ export default function ResetPassword() {
                                         name="password_confirmation" 
                                         id="password_confirmation" 
                                         label={"Confirm Password"} 
+                                        type={ showPassword ? "text" : "password" }
                                         validation={{
                                         ...password_validation.validation,
                                         validate: (val) => {
@@ -73,6 +79,11 @@ export default function ResetPassword() {
                                         },
                                         }} classname={""}
                                     />
+
+
+                                    <div className="absolute top-10 right-3 bg-red-0 z-10 p-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                        {!showPassword ? <RiEyeLine /> : <RiEyeOffLine />}
+                                    </div>
                                 </div>
 
                                 <button

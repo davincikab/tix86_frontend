@@ -105,7 +105,7 @@ export const Input = ({
 const InputError = ({ message }) => {
   return (
     <motion.p
-      className="flex items-center gap-1 px-2 font-semibold text-red-500 bg-red-100 rounded-md"
+      className="flex items-center gap-1 px-2 font-semibold text-red-500 bg-red-100 rounded-md text-xs"
       {...framer_error}
     >
       <MdError />

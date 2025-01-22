@@ -79,9 +79,10 @@ body {
 }
 
 
-.register .PhoneInput input {
-  background-color: #2F5D50;
-  border: none;
+.PhoneInput input {
+  /* background-color: #2F5D50; */
+  /* border: none; */
+  color:#000 !important;
 }
 
 .register .PhoneInput input:focus {

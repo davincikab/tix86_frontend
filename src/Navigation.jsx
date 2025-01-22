@@ -20,6 +20,8 @@ import CouponCodes from './pages/admin/CouponCodes';
 import ProfileUpdate from './pages/profile/ProfileUpdate';
 import RequestResetPasswordPage from './pages/login/RequestResetPasswordPage';
 import ResetPassword from './pages/login/ResetPassword';
+import PaymentCanceled from './pages/profile/PaymentCanceled';
+import Page404 from './404';
   
 
 const ProtectedRoute = ({ redirectPath="/signin", isAllowed, children}) => {
@@ -45,6 +47,14 @@ const Navigation = () => {
             element={
               <ProtectedRoute isAllowed={user && user.email}>
                 <ProfilePage />
+              </ProtectedRoute> 
+            } 
+          />
+
+          <Route path="/payment_canceled" 
+            element={
+              <ProtectedRoute isAllowed={user && user.email}>
+                <PaymentCanceled />
               </ProtectedRoute> 
             } 
           />
@@ -93,6 +103,9 @@ const Navigation = () => {
 
           <Route path="/" element={ <App />}>
             <Route index element={ <MainPage />} />
+          </Route>
+
+          <Route path="*" element={ <Page404 />}>
           </Route>
       </Routes>
   );

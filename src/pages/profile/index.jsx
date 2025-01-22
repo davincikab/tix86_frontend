@@ -12,6 +12,8 @@ import { useEffect,useCallback, useState } from 'react';
 import { sessionActions } from '../../store';
 import axios from '../../services/axio-config';
 import { formatPhoneNumber, formatPhoneNumberIntl } from 'react-phone-number-input';
+import VerificationForm from './VerificationForm';
+import Modal from '../../components/Modal';
 
 export default function ProfilePage() {
   const profile = useSelector(state => state.session.profile);
@@ -19,7 +21,12 @@ export default function ProfilePage() {
   const dispatch = useDispatch();
   const [promoCode, setPromoCode] = useState("");
   const [error, setError] = useState(null);
-  console.log(profile);
+  const [codeSent, setCodeSent] = useState({
+    isSuccessful:false,
+    error:"",
+    isLoading:false
+  });
+
 
   const loadUserStreets = useCallback(async() => {
     try {
@@ -39,26 +46,36 @@ export default function ProfilePage() {
    
   }, [profile, loadUserStreets]);
 
-  const createOrder = () => {
+  const createSubscription = async(data, actions) => {
+    return actions.subscription.create({
+      // plan_id: "P-3RX065706M3469222L5IFM4I",
+      // 'plan_id': 'P-8M253739RD267825AL4PR2CY'
 
-  }
+      plan_id:'P-08166597P27863733M5HQHLA'
 
-  const onApprove = (data) => {
+      // P-8M253739R825AL4PR2CY
+    });
+  } 
+
+  const onApprove = async (data) => {
+    console.log(data);
+
      // replace this url with your server
-     return fetch("https://react-paypal-js-storybook.fly.dev/api/paypal/capture-order", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-              orderID: data.orderID,
-          }),
-      })
-      .then((response) => response.json())
-      .then((orderData) => {
-          // Your code here after capture the order
-          console.log(orderData);
-      });
+     let userData = {
+      'subscription_id':data.subscriptionID,
+      'uuid':'',
+      'userId':user.id,
+      'is_active':true,
+      'subscription_date':new Date.toISOString()
+    };
+
+    try {
+      let response = await axios.post("/process_subscription_payment", {...userData});
+      console.log(response);
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const handleSubmit = async(e) => {
@@ -66,7 +83,6 @@ export default function ProfilePage() {
 
     try {
       let response = await axios.post('/activate_subscription_by_couponcode', {code:promoCode, userId:user.id });
-      console.log(response);
 
       let { subscription } = response.data;
       dispatch(sessionActions.updateProfile({...profile,subscription}))      
@@ -79,26 +95,62 @@ export default function ProfilePage() {
     }
   }
 
+  const sendVerificationCode = async () => {
+    setCodeSent(prevState => ({...prevState, isLoading:true}))
+    try {
+      let response = await axios.post("/send_phone_number_verification_code", { phone_number:user.phone_number });
+      console.log(response);
+      setCodeSent(prevState => ({...prevState, isSuccessful:true}));
+      
+    } catch (error) {
+      console.log(error);
+      if(error.status == 500) {
+        let err = error.response.data.error;
+        
+
+        if(err && err.includes("Alpha sender not configured")) {
+          console.log(err);
+          setCodeSent({
+            ...codeSent, 
+            error:"Invalid Phone Number or Non US Phone Number", 
+            isSuccessful:false 
+          })
+        } else {
+          setCodeSent({
+            ...codeSent, 
+            error:"Internal Server Error", 
+            isSuccessful:false 
+          })
+        }
+        
+        
+      }
+      
+    } finally {
+      setCodeSent(prevState => ({...prevState, isLoading:false}))
+    }
+  }
+
 
   // promo code activation
-  console.log(profile);
+  console.log(user);
 
   const style = { layout: "vertical", shape: 'rect', color: 'gold',label: 'subscribe' };
   return (
     <div className='w-full h-full relative overflow-x-hidden '>
         <Navbar />
         { !profile ?
-        <div className="relative h-auto bg-gray-300 p-5 min-h-[80vh]">
+        <div className="relative h-auto md:bg-gray-300 p-5 min-h-[80vh]">
           <p>Loading User Data</p>
         </div>
-        : <div className="relative h-auto bg-gray-300 p-5 min-h-[80vh]">   
+        : <div className="relative h-auto md:bg-gray-300 p-5 min-h-[80vh]">   
 
 
             <div className="user-info-section relative min-h-[40%] h-auto mx-auto max-w-[1080px] bg-white shadow-md p-5 rounded-md">
 
               <div className="absolute right-0 top-0">
                 <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-                  {profile.subscription.is_active ? "Active" : "Inactive"}
+                  {profile.subscription && profile?.subscription.is_active ? "Active" : "Inactive"}
                 </span>
               </div>
 
@@ -130,6 +182,27 @@ export default function ProfilePage() {
                         <div className="flex-1"></div>
                       </div>
                   </div>
+
+                  { !user.is_phone_number_verified && <div className="verify_phone_number">
+                    <div className="header">
+                      <h5 className='text-lg font-semibold'>Verify Phone Number</h5>
+                    </div>
+
+                    <div className="verify">
+                      <button onClick={sendVerificationCode} className='my-2 rounded-[30px] font-bold bg-[#0163aa] disabled:bg-[#2c6353]/60 disabled:border-[#2c6353]/60 disabled:text-[#2c6353]/60 py-2 px-4 text-white cursor-pointer'>
+                        { codeSent.isLoading ? "Sending" : "Send Code"}
+                      </button>
+
+                      { !codeSent.isSuccessful && <div className='text-red-200'>{codeSent.error}</div> }
+                    </div>
+
+                    { codeSent.isSuccessful ? <Modal isOpen={true} activeTab={""}>
+                      <VerificationForm />
+                    </Modal> : "" }
+                    
+                    
+                    
+                  </div> }
                
                   <div className="streets">
                     <div className="header">
@@ -155,16 +228,16 @@ export default function ProfilePage() {
                         <h5 className='text-lg font-semibold'>Subscription Info</h5>
                     </div>
 
-                    <div className="text-gray-600">
+                    { profile.subscription ? <div className="text-gray-600">
                       <div className='flex w-full justify-between'>
                         <div className="flex flex-col my-2">
                           <div className="font-semibold">Text Notification</div>
-                          <div className="">{profile.subscription.text_notification ? "On" : "Off"}</div>
+                          <div className="">{profile?.subscription.text_notification ? "On" : "Off"}</div>
                         </div>
 
                         <div className="flex flex-col my-2">
                           <div className="font-semibold">Email Notification</div>
-                          <div className="">{profile.subscription.email_notification ? "On" : "Off"}</div>
+                          <div className="">{profile?.subscription.email_notification ? "On" : "Off"}</div>
                         </div>
                       </div>
                     
@@ -172,8 +245,8 @@ export default function ProfilePage() {
                       <div className="flex flex-col my-2">
                         <div className="font-semibold">Notification alerts</div>
                         <div className="my-2 text-white">
-                          <span className='bg-[#0163AA] shadow-md p-1 px-3 mx-0 rounded-xl '>12hrs : {profile.subscription.twelve_hours ? "On" : "Off" }</span>
-                          <span className='bg-[#0163AA] shadow-md p-1 px-3 mx-2 rounded-xl '>1hr : {profile.subscription.one_hour ? "On" : "Off" }</span>
+                          <span className='bg-[#0163AA] shadow-md p-1 px-3 mx-0 rounded-xl '>12hrs : {profile?.subscription.twelve_hours ? "On" : "Off" }</span>
+                          <span className='bg-[#0163AA] shadow-md p-1 px-3 mx-2 rounded-xl '>1hr : {profile?.subscription.one_hour ? "On" : "Off" }</span>
                           
                         </div>
                       </div>
@@ -186,7 +259,7 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                    </div>
+                    </div> : <div>Kindly Select Street and Update Subcription Info</div>}
                   </div>
 
                   <div className='my-5'>
@@ -194,12 +267,12 @@ export default function ProfilePage() {
                         <h5 className='text-lg font-semibold'>Actions</h5>
                     </div>
 
-                    <div className='grid grid-cols-2 w-full gap-2'>
-                      <a  href="/change_password" className='p-3 shadow-md rounded-md text-white bg-[#0163AA] w-full'>
+                    <div className='grid md:grid-cols-2 w-full gap-2 flex-col md:flex-row'>
+                      <a  href="/change_password" className='p-3 shadow-md rounded-md text-white bg-[#0163AA] w-full text-center'>
                         Change Password
                       </a>
 
-                      <a href="/profile_update" className='p-3 shadow-md rounded-md text-white bg-[#0163AA] w-full'>
+                      <a href="/profile_update" className='p-3 shadow-md rounded-md text-white bg-[#0163AA] w-full text-center'>
                         Update Profile
                       </a>
 
@@ -214,7 +287,7 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            { !profile?.subscription.is_active && <div className="relative payment-section md:flex-row py-10 space-x-5 flex-col flex justify-center mx-auto max-w-[1080px] bg-white shadow-md px-3 rounded-md mt-5">
+            { (profile.subscription && !profile?.subscription.is_active) && <div className="relative payment-section md:flex-row py-10 space-x-5 flex-col flex justify-center mx-auto max-w-[1080px] bg-white shadow-md px-3 rounded-md mt-5">
 
               <div className="absolute top-1 p-3">
                 <h4 className='font-semibold text-lg'>Payment Details</h4>
@@ -261,15 +334,24 @@ export default function ProfilePage() {
                         <h5 className="">Debit / Credit Cards</h5>
                     </div>
                     <div className="card-body">
-                      <PayPalScriptProvider options={{ clientId: "test" }}>
+                      <PayPalScriptProvider 
+                        options={{ 
+                            intent:'subscription', 
+                            clientId:'AXglID5g1MCLQUPiQ3QR8uYdzQSxsNoZO0kJugdJre6GPvc7S1-JosMcKU5n9QZuPPWk3yPUQSWgxxpE',
+                            // "AYNY1EZahVCYNWDa_L5MLRTO3IOqE4V-vJfiYWFuX7JOMbDUDvJIs-YLDFefM0_mK1pGxDrxDGlRE-Xw", 
+                            vault:true 
+                          }}
+                        >
                         <ButtonWrapper 
                           showSpinner={false} 
                           style={style}
                           disabled={false}
                           forceReRender={[style]}
                           fundingSource={undefined}
-                          createOrder={createOrder}
+                          // createOrder={createOrder}
+                          createSubscription={createSubscription}
                           onApprove={onApprove}
+                          
                         />
                       </PayPalScriptProvider>
                     </div>
@@ -285,19 +367,19 @@ export default function ProfilePage() {
 }
 
 
-const ButtonWrapper = ({ showSpinner, onApprove, style, createOrder }) => {
+const ButtonWrapper = ({ showSpinner, onApprove, style, createSubscription }) => {
   const [{ isPending }] = usePayPalScriptReducer();
 
   return (
       <>
           { (showSpinner && isPending) && <div className="spinner" /> }
           <PayPalButtons
-              style={style}
-              disabled={false}
-              forceReRender={[style]}
-              fundingSource={undefined}
-              createOrder={createOrder}
-              onApprove={onApprove}
+            style={style}
+            disabled={false}
+            forceReRender={[style]}
+            fundingSource={undefined}
+            createSubscription={createSubscription}
+            onApprove={onApprove}
           />
       </>
   );

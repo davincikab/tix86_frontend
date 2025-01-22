@@ -6,11 +6,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 import axios from "../../services/axio-config";
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useState } from 'react';
+import { RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 
 export default function ChangePassword() {
     const methods = useForm();
     const navigate = useNavigate();
     const user = useSelector(state => state.session.user);
+    const [showPassword, setShowPassword] = useState(false);
 
     const onSubmit = methods.handleSubmit(data => {
         console.log(data);
@@ -36,18 +39,21 @@ export default function ChangePassword() {
         <div className='w-full h-full relative overflow-x-hidden'>
             <Navbar />
             
-            <div className="h-[80vh] bg-gray-100 p-20">
+            <div className="h-[80vh] md:bg-gray-100 md:p-20 p-10">
                 <div className="flex items-center flex-col bg-white shadow-md max-w-[1080px] mx-auto md:w-[40%] w-full p-5 rounded-md">
                     <h5 className="font-semibold text-lg">Change Password</h5>
 
                     <FormProvider {...methods}>
                         <form className="p-2 w-full p-5">
                             <div className="flex flex-col">
-                                <div className="my-3">
-                                    <Input {...password_validation} name="password"/>
+                                <div className="my-3 relative">
+                                    <Input {...password_validation} name="password" type={ showPassword ? "text" : "password" }/>
+                                    <div className="absolute top-10 right-3 bg-red-0 z-10 p-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                        {!showPassword ? <RiEyeLine /> : <RiEyeOffLine />}
+                                    </div>
                                 </div>
 
-                                <div className="my-3">
+                                <div className="my-3 relative">
                                     {/* <Input name="password-confirmation" {...password_validation} label={"Confirm Password"}/> */}
 
                                     <Input 
@@ -55,6 +61,7 @@ export default function ChangePassword() {
                                         name="password_confirmation" 
                                         id="password_confirmation" 
                                         label={"Confirm Password"} 
+                                        type={ showPassword ? "text" : "password" }
                                         validation={{
                                         ...password_validation.validation,
                                         validate: (val) => {
@@ -64,6 +71,11 @@ export default function ChangePassword() {
                                         },
                                         }} classname={""}
                                     />
+
+
+                                    <div className="absolute top-10 right-3 bg-red-0 z-10 p-2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+                                        {!showPassword ? <RiEyeLine /> : <RiEyeOffLine />}
+                                    </div>
                                 </div>
 
                                 <button

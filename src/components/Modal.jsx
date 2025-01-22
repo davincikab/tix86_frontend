@@ -4,7 +4,7 @@ import useOnClickOutside from './useOutsideClick';
 import { BiX } from 'react-icons/bi';
 
 export default function Modal(props) {
-    const [isOpen, setIsOpen] = useState(props.isOpen);
+    const [isOpen, setIsOpen] = useState(props.isOpen || true);
     const ref = useRef(null);
 
     const handleClick = () => {
@@ -24,7 +24,7 @@ export default function Modal(props) {
                 
                 <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-white capitalize">
-                        {props.activeTab.split("_").join(" ")}
+                        {props.activeTab ? props.activeTab.split("_").join(" ") : ""}
                     </h3>
                     <button type="button" onClick={handleClick} className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="static-modal">
                         {/* <X /> */}
