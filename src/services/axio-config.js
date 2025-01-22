@@ -12,7 +12,7 @@ const instance = axios.create({
 //     config.headers.Authorization = `Bearer ${token}`;
 //     // config.headers['x-access-token'] = token;
 //   }
-//   return config;
+//   return config; +1 858 699 0029
 // });
 
 instance.interceptors.request.use(request => {

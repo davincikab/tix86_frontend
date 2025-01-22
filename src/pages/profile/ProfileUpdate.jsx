@@ -11,7 +11,6 @@ import { sessionActions } from '../../store';
 
 export default function ProfileUpdate() {
   const user = useSelector(state => state.session.user);
-  console.log(user);
   
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -34,42 +33,38 @@ export default function ProfileUpdate() {
 
   const handleRegistration = async(data) => {
       try {
-          await axios.post("/update_user", { ...data, email:user.email });
-
-          if(data.phone_number !== user.phone_number) {
-            dispatch(sessionActions.updateUser({ 
-              ...user, 
-              ...data,
-              is_phone_number_verified:false 
-            }))
-            localStorage.setItem("user", JSON.stringify({ ...user, ...data, is_phone_number_verified:false }));
-          } else {
-            dispatch(sessionActions.updateUser({ ...user, ...data, is_phone_number_verified:true }))
-            localStorage.setItem("user", JSON.stringify({ ...user, ...data, is_phone_number_verified:true }));
-          }
-
+          let response = await axios.post("/update_user", { ...data, email:user.email });
+          dispatch(sessionActions.updateUser({ 
+            ...user, 
+            ...response.data
+          }))
+          localStorage.setItem("user", JSON.stringify({ 
+            ...user, 
+            ...response.data
+          }));
 
           // redirect to verification page
-          navigate("/profile");
+          setTimeout(() => {
+            navigate("/profile");
+          }, 200);
+          
       } catch (error) {
-          console.log(error);
-          if(error['message']) {
-              setError(error.message);
-          }
-
+          
           if(error.status == 400) {
               let { errors } = error.response.data;
-
               errors.forEach(err => {
-                  methods.setError(err.path, {message:err.msg});
+                methods.setError(err.path.toLocaleLowerCase().split(" ").join("_"), { message:err.message });
               });
               
+          } else if(error['message']) {
+            setError(error.message);
           }
       } finally {
           setIsLoading(false);
       }
   }
 
+  
   return (
     <div className='w-full h-full relative overflow-x-hidden '>
         <Navbar />

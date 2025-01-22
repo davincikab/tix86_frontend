@@ -14,6 +14,7 @@ import axios from '../../services/axio-config';
 import { formatPhoneNumber, formatPhoneNumberIntl } from 'react-phone-number-input';
 import VerificationForm from './VerificationForm';
 import Modal from '../../components/Modal';
+import { update } from 'lodash';
 
 export default function ProfilePage() {
   const profile = useSelector(state => state.session.profile);
@@ -40,7 +41,6 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if(!profile) {
-      console.log("loading user profile");
       loadUserStreets();
     }
    
@@ -48,31 +48,37 @@ export default function ProfilePage() {
 
   const createSubscription = async(data, actions) => {
     return actions.subscription.create({
-      // plan_id: "P-3RX065706M3469222L5IFM4I",
-      // 'plan_id': 'P-8M253739RD267825AL4PR2CY'
-
-      plan_id:'P-08166597P27863733M5HQHLA'
-
-      // P-8M253739R825AL4PR2CY
+      'plan_id': 'P-8M253739RD267825AL4PR2CY'
     });
   } 
 
+  const onCancel = (data) => {
+    // redirect to cancel 
+    window.location.assign("/payment_cancelled/");
+    console.log(data);
+  }
+
+  const onError = (error) => {
+    // display the error message on snackbar 
+    console.log(error);
+    alert(error);
+  }
+
   const onApprove = async (data) => {
     console.log(data);
-
      // replace this url with your server
      let userData = {
       'subscription_id':data.subscriptionID,
       'uuid':'',
       'userId':user.id,
       'is_active':true,
-      'subscription_date':new Date.toISOString()
+      'subscription_date':new Date().toISOString()
     };
 
     try {
       let response = await axios.post("/process_subscription_payment", {...userData});
-      console.log(response);
-      window.location.reload();
+      dispatch(sessionActions.updateProfile({...profile, subscription:response.data }));
+      // window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -133,7 +139,7 @@ export default function ProfilePage() {
 
 
   // promo code activation
-  console.log(user);
+  console.log(profile);
 
   const style = { layout: "vertical", shape: 'rect', color: 'gold',label: 'subscribe' };
   return (
@@ -333,12 +339,26 @@ export default function ProfilePage() {
                     <div className="card-header">
                         <h5 className="">Debit / Credit Cards</h5>
                     </div>
+
+                    {/* <button 
+                      className='bg-blue-400 text-white px-3 py-1 rounded-md my-2'
+                      onClick={() => onApprove(
+                          {
+                            "facilitatorAccessToken": "A21AAObzyvAqDVX8kMHM8c21hNqJTG_yB6RM1nnbpf1r411M7qFclHutTtkNeGDmxxzjn8c48PjMDybZivnyUyi_u9XMb052w",
+                            "orderID": "8N9194436C556074L",
+                            "paymentSource": "paypal",
+                            "subscriptionID": "I-6XACNH7GHH95"
+                          }
+                        )}
+                    >
+                    Update Subscriptions
+                    </button> */}
                     <div className="card-body">
                       <PayPalScriptProvider 
                         options={{ 
                             intent:'subscription', 
-                            clientId:'AXglID5g1MCLQUPiQ3QR8uYdzQSxsNoZO0kJugdJre6GPvc7S1-JosMcKU5n9QZuPPWk3yPUQSWgxxpE',
-                            // "AYNY1EZahVCYNWDa_L5MLRTO3IOqE4V-vJfiYWFuX7JOMbDUDvJIs-YLDFefM0_mK1pGxDrxDGlRE-Xw", 
+                            // clientId:'AXglID5g1MCLQUPiQ3QR8uYdzQSxsNoZO0kJugdJre6GPvc7S1-JosMcKU5n9QZuPPWk3yPUQSWgxxpE',
+                            clientId:"AYNY1EZahVCYNWDa_L5MLRTO3IOqE4V-vJfiYWFuX7JOMbDUDvJIs-YLDFefM0_mK1pGxDrxDGlRE-Xw", 
                             vault:true 
                           }}
                         >
@@ -351,6 +371,8 @@ export default function ProfilePage() {
                           // createOrder={createOrder}
                           createSubscription={createSubscription}
                           onApprove={onApprove}
+                          onCancel={onCancel}
+                          onError={onError}
                           
                         />
                       </PayPalScriptProvider>
@@ -367,7 +389,7 @@ export default function ProfilePage() {
 }
 
 
-const ButtonWrapper = ({ showSpinner, onApprove, style, createSubscription }) => {
+const ButtonWrapper = ({ showSpinner, onApprove, onError, onCancel, style, createSubscription }) => {
   const [{ isPending }] = usePayPalScriptReducer();
 
   return (
@@ -379,6 +401,8 @@ const ButtonWrapper = ({ showSpinner, onApprove, style, createSubscription }) =>
             forceReRender={[style]}
             fundingSource={undefined}
             createSubscription={createSubscription}
+            onCancel={onCancel}
+            onError={onError}
             onApprove={onApprove}
           />
       </>

@@ -51,7 +51,7 @@ const Navigation = () => {
             } 
           />
 
-          <Route path="/payment_canceled" 
+          <Route path="/payment_cancelled" 
             element={
               <ProtectedRoute isAllowed={user && user.email}>
                 <PaymentCanceled />
