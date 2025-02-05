@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const BASE_URL = "http://localhost:3000/";
-// export const BASE_URL = 'https://davincikab.pythonanywhere.com/';
+// export const BASE_URL = 'https://test.tix86.com/';
 const instance = axios.create({
   baseURL:BASE_URL
 });

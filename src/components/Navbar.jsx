@@ -1,4 +1,4 @@
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.jpg';
 // import { useLocalization, useTranslation } from './LocalizationProvider';
 // import { sessionActions } from '../../store';
 import { NavLink, useNavigate } from 'react-router-dom';
@@ -47,7 +47,7 @@ const Navbar = () => {
         <nav className="bg-white border-b border-gray-200  dark:bg-gray-900 w-full">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto md:p-4 p-2">
                 <a href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-                    <img src={logo} alt="Pow pow" className='h-16' />
+                    <img src={logo} alt="Pow pow" className='h-12' />
                 </a>
 
                 <div className="flex items-center md:order-2 space-x-1 md:space-x-0 rtl:space-x-reverse">
