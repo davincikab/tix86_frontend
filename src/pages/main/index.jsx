@@ -179,6 +179,7 @@ const MainPage = () => {
   }
 
   let { text_notification, email_notification, twelve_hours, one_hour } = state;
+  console.log(user)
   
   return (
     <div className='w-full h-full relative overflow-x-hidden'>
@@ -193,7 +194,8 @@ const MainPage = () => {
               zoom: 10,
               bounds:map_bounds
             }}
-            style={{width: "100vw", height: "90vh"}}
+            id="map-id"
+            style={{width: "100vw", height:"90vh"}}
             mapStyle='mapbox://styles/ramz858/ckbx684hi1m4m1inxh6sdnxwv'
             maxBounds={bounds}
             interactive={true}
@@ -210,16 +212,11 @@ const MainPage = () => {
             <Layer {...routeSelectedStyle} filter={['in', ['get', 'SL'], streets.map(str => str.name).join(",")]}> </Layer>
           </Source> 
 
-            {/* selected routes */}
-          {/* <Source type="vector" url="mapbox://ramz858.ckbrddrjh00u222o5ufdwlt2r-6mw1r" buffer={500}>
-            <Layer {...routeStyle}> </Layer>
-            <Layer {...routeSelectedStyle} filter={['in', ['get', 'SL'], '']}> </Layer>
-          </Source>          */}
 
           <GeocoderControl mapboxAccessToken={accessToken} position="top-left" />
         </Map>
      
-      <div className="absolute bg-white z-10 md:top-0 right-2 md:bottom-5 md:m-5 rounded-[5px] text-black w-[300px] shadow-lg overflow-y-auto m-0 top-[50vh] bottom-2">
+      <div className="md:absolute bg-white z-10 md:top-0 right-2 md:bottom-5 md:m-5 rounded-[5px] text-black w-full md:w-[300px] shadow-lg overflow-y-auto m-0 top-[50vh] bottom-2">
         <h6 className="text-center mx-0 font-bold capitalize bg-gray-100 p-4 text-lg">Set your street sweeping alerts</h6>
         
         <hr className='my-1'/>
@@ -252,9 +249,19 @@ const MainPage = () => {
 
           <div className="my-3">
             <label className="inline-flex items-center mb-0 cursor-pointer" htmlFor='text_notification'>
-              <input type="checkbox" className="sr-only peer"  id='text_notification' checked={text_notification} onChange={handleOnChange}/>
-              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300  rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all  peer-checked:bg-[#0163AA]"></div>
-              <span className="ms-3 text-sm font-medium text-gray-900 ">Text Notification</span>
+              <input 
+                type="checkbox" className="sr-only peer"  
+                id='text_notification' 
+                checked={text_notification} 
+                onChange={handleOnChange} 
+                disabled={!user?.is_phone_number_verified}
+              />
+              {user?.is_phone_number_verified ?
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300  rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all  peer-checked:bg-[#0163AA]"></div>
+                : 
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300  rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all  peer-checked:bg-[#ddd]"></div>
+              }
+              <span className={`ms-3 text-sm font-medium text-gray-900 ${ !user?.is_phone_number_verified ? 'text-gray-300' : ''}`}>Text Notification</span>
             </label>
           </div>
 

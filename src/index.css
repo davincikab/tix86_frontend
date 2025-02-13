@@ -90,6 +90,10 @@ body {
 }
 
 @media screen  and (max-width:480px) {
+  #map-id {
+    height: 70vh !important;
+  }
+  
   body {
     background-image: url('/images/bg-image.jpg');
     background-color: #05204b;
