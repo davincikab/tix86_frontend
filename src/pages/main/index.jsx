@@ -1,4 +1,4 @@
-import Map, {Source, Layer } from 'react-map-gl';
+import Map, {Source, Layer, GeolocateControl } from 'react-map-gl';
 import mapboxgl from 'mapbox-gl';
 import GeocoderControl from './GeocoderControl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -14,6 +14,8 @@ import bbox from '@turf/bbox';
 import { sessionActions } from '../../store';
 import { useNavigate } from 'react-router-dom';
 import { map } from 'framer-motion/client';
+import Modal from '../../components/Modal';
+import VerificationForm from '../profile/VerificationForm';
 
 let accessToken = 'pk.eyJ1IjoicmFtejg1OCIsImEiOiJjazl1N3ZxYnUxa2dlM2dtb3ozemhtZWJ2In0.c7Pc5LCE0rvGoJ6hZYEftg';
 let bounds = [
@@ -44,6 +46,13 @@ const MainPage = () => {
     }
   );
 
+  const [codeSent, setCodeSent] = useState({
+    isSuccessful:false,
+    error:"",
+    isLoading:false
+  });
+
+  console.log(user)
   const zoomToBounds = useCallback(() => {
     console.log(streets);
     // return;
@@ -178,8 +187,43 @@ const MainPage = () => {
       }
   }
 
+  const sendVerificationCode = async () => {
+    setCodeSent(prevState => ({...prevState, isLoading:true}))
+    try {
+      let response = await axios.post("/send_phone_number_verification_code", { phone_number:user.phone_number });
+      console.log(response);
+      setCodeSent(prevState => ({...prevState, isSuccessful:true}));
+      
+    } catch (error) {
+      console.log(error);
+      if(error.status == 500) {
+        let err = error.response.data.error;
+        
+
+        if(err && err.includes("Alpha sender not configured")) {
+          console.log(err);
+          setCodeSent({
+            ...codeSent, 
+            error:"Invalid Phone Number or Non US Phone Number", 
+            isSuccessful:false 
+          })
+        } else {
+          setCodeSent({
+            ...codeSent, 
+            error:"Internal Server Error", 
+            isSuccessful:false 
+          })
+        }
+        
+        
+      }
+      
+    } finally {
+      setCodeSent(prevState => ({...prevState, isLoading:false}))
+    }
+  }
+
   let { text_notification, email_notification, twelve_hours, one_hour } = state;
-  console.log(user)
   
   return (
     <div className='w-full h-full relative overflow-x-hidden'>
@@ -212,8 +256,9 @@ const MainPage = () => {
             <Layer {...routeSelectedStyle} filter={['in', ['get', 'SL'], streets.map(str => str.name).join(",")]}> </Layer>
           </Source> 
 
-
           <GeocoderControl mapboxAccessToken={accessToken} position="top-left" />
+          <GeolocateControl position='top-left'/>
+          
         </Map>
      
       <div className="md:absolute bg-white z-10 md:top-0 right-2 md:bottom-5 md:m-5 rounded-[5px] text-black w-full md:w-[300px] shadow-lg overflow-y-auto m-0 top-[50vh] bottom-2">
@@ -222,9 +267,23 @@ const MainPage = () => {
         <hr className='my-1'/>
         <div className="px-4 py-2">
           {!user.is_phone_number_verified ? 
+            <>
             <div className="p-4 mb-4 text-xs text-red-800 rounded-lg bg-red-50" role="alert">
               <span className="font-medium">Kindly verify your phone Number. <a href='/profile' target='_blank' className='text-blue-900 underline'>Verify</a></span>
             </div> 
+
+            <div className="verify">
+                <button onClick={sendVerificationCode} className='my-2 rounded-[30px] font-bold bg-[#0163aa] disabled:bg-[#2c6353]/60 disabled:border-[#2c6353]/60 disabled:text-[#2c6353]/60 py-2 px-4 text-white cursor-pointer'>
+                  { codeSent.isLoading ? "Sending" : "Send Code"}
+                </button>
+            
+                  { !codeSent.isSuccessful && <div className='text-red-200'>{codeSent.error}</div> }
+                </div>
+            
+                { codeSent.isSuccessful ? <Modal isOpen={true} activeTab={""}>
+                  <VerificationForm />
+                </Modal> : "" }
+            </>
             : ""}
           {
             streets.map(entry => {
